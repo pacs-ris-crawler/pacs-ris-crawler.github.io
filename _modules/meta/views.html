@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>meta.views &mdash; PACS-RIS Crawler 1.0a documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PACS-RIS Crawler
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Systems Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Code Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PACS-RIS Crawler</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>meta.views</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for meta.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">make_response</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">send_file</span>
+<span class="kn">from</span> <span class="nn">requests</span> <span class="k">import</span> <span class="n">RequestException</span><span class="p">,</span> <span class="n">get</span><span class="p">,</span> <span class="n">post</span>
+
+<span class="kn">from</span> <span class="nn">meta.app</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">MOVA_URL</span><span class="p">,</span>
+    <span class="n">MOVA_DASHBOARD_URL</span><span class="p">,</span>
+    <span class="n">MOVA_DOWNLOAD_URL</span><span class="p">,</span>
+    <span class="n">MOVA_TRANSFER_URL</span><span class="p">,</span>
+    <span class="n">REPORT_SHOW_URL</span><span class="p">,</span>
+    <span class="n">RESULT_LIMIT</span><span class="p">,</span>
+    <span class="n">SHOW_DOWNLOAD_OPTIONS</span><span class="p">,</span>
+    <span class="n">SHOW_TRANSFER_TARGETS</span><span class="p">,</span>
+    <span class="n">TRANSFER_TARGETS</span><span class="p">,</span>
+    <span class="n">VERSION</span><span class="p">,</span>
+    <span class="n">ZFP_VIEWER</span><span class="p">,</span>
+    <span class="n">app</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">meta.convert</span> <span class="k">import</span> <span class="n">convert</span>
+<span class="kn">from</span> <span class="nn">meta.paging</span> <span class="k">import</span> <span class="n">calc</span>
+<span class="kn">from</span> <span class="nn">meta.query</span> <span class="k">import</span> <span class="n">query_body</span><span class="p">,</span> <span class="n">query_indexed_dates</span>
+<span class="kn">from</span> <span class="nn">meta.query_all</span> <span class="k">import</span> <span class="n">query_all</span>
+<span class="kn">from</span> <span class="nn">meta.solr</span> <span class="k">import</span> <span class="n">solr_url</span>
+<span class="kn">from</span> <span class="nn">meta.statistics</span> <span class="k">import</span> <span class="n">calculate</span>
+<span class="kn">from</span> <span class="nn">meta.terms</span> <span class="k">import</span> <span class="n">get_terms_data</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../web/meta.html#meta.views.main">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Renders the initial page. &quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">query_indexed_dates</span><span class="p">(</span><span class="n">solr_url</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">RequestException</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
+            <span class="s2">&quot;search.html&quot;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{},</span>
+            <span class="n">error</span><span class="o">=</span><span class="s2">&quot;No response from Solr, is it running?&quot;</span><span class="p">,</span>
+            <span class="n">trace</span><span class="o">=</span><span class="n">solr_url</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;stats&quot;</span><span class="p">]</span>
+    <span class="n">indexed_start_date</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;stats_fields&quot;</span><span class="p">][</span><span class="s2">&quot;StudyDate&quot;</span><span class="p">][</span><span class="s2">&quot;min&quot;</span><span class="p">]</span>
+    <span class="n">indexed_end_date</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;stats_fields&quot;</span><span class="p">][</span><span class="s2">&quot;StudyDate&quot;</span><span class="p">][</span><span class="s2">&quot;max&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
+        <span class="s2">&quot;search.html&quot;</span><span class="p">,</span>
+        <span class="n">version</span><span class="o">=</span><span class="n">VERSION</span><span class="p">,</span>
+        <span class="n">page</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;RisReport&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">},</span>
+        <span class="n">indexed_start_date</span><span class="o">=</span><span class="n">indexed_start_date</span><span class="p">,</span>
+        <span class="n">indexed_end_date</span><span class="o">=</span><span class="n">indexed_end_date</span><span class="p">,</span>
+        <span class="n">mova_url</span><span class="o">=</span><span class="n">MOVA_URL</span><span class="p">,</span>
+        <span class="n">mova_dashboard_url</span><span class="o">=</span><span class="n">MOVA_DASHBOARD_URL</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="search"><a class="viewcode-back" href="../../web/meta.html#meta.views.search">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/search&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">search</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Renders the search results. &quot;&quot;&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="n">query_body</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">RESULT_LIMIT</span><span class="p">)</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">solr_url</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">RequestException</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
+            <span class="s2">&quot;search.html&quot;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+            <span class="n">error</span><span class="o">=</span><span class="s2">&quot;No response from Solr, is it running?&quot;</span><span class="p">,</span>
+            <span class="n">trace</span><span class="o">=</span><span class="n">solr_url</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&gt;=</span> <span class="mi">400</span> <span class="ow">and</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&lt;</span> <span class="mi">500</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
+            <span class="s2">&quot;search.html&quot;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+            <span class="n">page</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">error</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">reason</span><span class="p">,</span>
+            <span class="n">trace</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&gt;=</span> <span class="mi">500</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">][</span><span class="s2">&quot;msg&quot;</span><span class="p">]</span>
+        <span class="n">trace</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;trace&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">reposonse</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
+            <span class="s2">&quot;search.html&quot;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+            <span class="n">page</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">error</span><span class="o">=</span><span class="s2">&quot;Solr failed: &quot;</span> <span class="o">+</span> <span class="n">msg</span><span class="p">,</span>
+            <span class="n">trace</span><span class="o">=</span><span class="n">trace</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calling Solr with url </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Request body </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="n">docs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;grouped&quot;</span><span class="p">][</span><span class="s2">&quot;PatientID&quot;</span><span class="p">]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;grouped&quot;</span><span class="p">][</span><span class="s2">&quot;PatientID&quot;</span><span class="p">][</span><span class="s2">&quot;ngroups&quot;</span><span class="p">]</span>
+        <span class="n">studies_result</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;grouped&quot;</span><span class="p">][</span><span class="s2">&quot;PatientID&quot;</span><span class="p">][</span><span class="s2">&quot;matches&quot;</span><span class="p">]</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;page&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;offset&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">paging</span> <span class="o">=</span> <span class="n">calc</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">RESULT_LIMIT</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
+            <span class="s2">&quot;result.html&quot;</span><span class="p">,</span>
+            <span class="n">docs</span><span class="o">=</span><span class="n">docs</span><span class="p">,</span>
+            <span class="n">results</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:,}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">results</span><span class="p">),</span>
+            <span class="n">studies_result</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:,}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">studies_result</span><span class="p">),</span>
+            <span class="n">payload</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+            <span class="n">facet_url</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+            <span class="n">paging</span><span class="o">=</span><span class="n">paging</span><span class="p">,</span>
+            <span class="n">version</span><span class="o">=</span><span class="n">VERSION</span><span class="p">,</span>
+            <span class="n">report_show_url</span><span class="o">=</span><span class="n">REPORT_SHOW_URL</span><span class="p">,</span>
+            <span class="n">zfp_viewer</span><span class="o">=</span><span class="n">ZFP_VIEWER</span><span class="p">,</span>
+            <span class="n">modalities</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s2">&quot;Modality&quot;</span><span class="p">),</span>
+            <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">,</span>
+            <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">show_download_options</span><span class="o">=</span><span class="n">SHOW_DOWNLOAD_OPTIONS</span><span class="p">,</span>
+            <span class="n">show_transfer_targets</span><span class="o">=</span><span class="n">SHOW_TRANSFER_TARGETS</span><span class="p">,</span>
+            <span class="n">transfer_targets</span><span class="o">=</span><span class="n">TRANSFER_TARGETS</span><span class="p">,</span>
+            <span class="n">mova_url</span><span class="o">=</span><span class="n">MOVA_URL</span><span class="p">,</span>
+            <span class="n">mova_dashboard_url</span><span class="o">=</span><span class="n">MOVA_DASHBOARD_URL</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="export_anon"><a class="viewcode-back" href="../../web/meta.html#meta.views.export_anon">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/export_anon&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">export_anon</span><span class="p">():</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">query_all</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">solr_url</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;PatientName&quot;</span><span class="p">,</span> <span class="s2">&quot;PatientBirthDate&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelWriter</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s2">&quot;Sheet1&quot;</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">attachment_filename</span><span class="o">=</span><span class="s2">&quot;export.xlsx&quot;</span><span class="p">,</span> <span class="n">as_attachment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="export"><a class="viewcode-back" href="../../web/meta.html#meta.views.export">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/export&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">export</span><span class="p">():</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">query_all</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">solr_url</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelWriter</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s2">&quot;Sheet1&quot;</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">attachment_filename</span><span class="o">=</span><span class="s2">&quot;export.xlsx&quot;</span><span class="p">,</span> <span class="n">as_attachment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="download_all"><a class="viewcode-back" href="../../web/meta.html#meta.views.download_all">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/download-all&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">download_all</span><span class="p">():</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;download all called&quot;</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">query_all</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">solr_url</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">convert</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">download_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span> <span class="s2">&quot;dir&quot;</span><span class="p">:</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;download-dir&quot;</span><span class="p">]}</span>
+    <span class="k">return</span> <span class="n">download_or_transfer</span><span class="p">(</span><span class="n">MOVA_DOWNLOAD_URL</span><span class="p">,</span> <span class="n">download_data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="download"><a class="viewcode-back" href="../../web/meta.html#meta.views.download">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/download&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">download</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Ajax post to download series of images. &quot;&quot;&quot;</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;download called&quot;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">download_or_transfer</span><span class="p">(</span><span class="n">MOVA_DOWNLOAD_URL</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="transfer_all"><a class="viewcode-back" href="../../web/meta.html#meta.views.transfer_all">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/transfer-all&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">transfer_all</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Ajax post to transfer series of images to &lt;target&gt; PACS node. &quot;&quot;&quot;</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;transfer all called&quot;</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">query_all</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">solr_url</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">convert</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
+    <span class="n">transfer_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]}</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;transfer called and sending to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">TRANSFER_TARGETS</span> <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="s2">&quot;DISPLAY_NAME&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">target</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">t</span><span class="p">:</span>
+        <span class="n">destination</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;AE_TITLE&quot;</span><span class="p">]</span>
+        <span class="n">transfer_data</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">destination</span>
+        <span class="k">return</span> <span class="n">download_or_transfer</span><span class="p">(</span><span class="n">MOVA_TRANSFER_URL</span><span class="p">,</span> <span class="n">transfer_data</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;Error: Could not find destination AE_TITLE for </span><span class="si">{t}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="transfer"><a class="viewcode-back" href="../../web/meta.html#meta.views.transfer">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/transfer&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">transfer</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Ajax post to transfer series of images to &lt;target&gt; PACS node. &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">series_list</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;transfer called and sending to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">TRANSFER_TARGETS</span> <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="s2">&quot;DISPLAY_NAME&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">target</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">t</span><span class="p">:</span>
+        <span class="n">destination</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;AE_TITLE&quot;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">destination</span>
+        <span class="k">return</span> <span class="n">download_or_transfer</span><span class="p">(</span><span class="n">MOVA_TRANSFER_URL</span><span class="p">,</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;Error: Could not find destination AE_TITLE&quot;</span></div>
+
+
+<div class="viewcode-block" id="download_or_transfer"><a class="viewcode-back" href="../../web/meta.html#meta.views.download_or_transfer">[docs]</a><span class="k">def</span> <span class="nf">download_or_transfer</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="n">requests</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;POST to url </span><span class="si">{url}</span><span class="s2"> failed&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Error posting to f</span><span class="si">{url}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">reason</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;POST failed&quot;</span><span class="p">})</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;ConnectionError: Can&#39;t connect to receiver&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Is pacs_ris_crawler-receiver running? Can&#39;t get a connection&quot;</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="terms"><a class="viewcode-back" href="../../web/meta.html#meta.views.terms">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/terms&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">terms</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Renders a page about term information. Only internal use. &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">get_terms_data</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;terms.html&quot;</span><span class="p">,</span> <span class="n">terms</span><span class="o">=</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="statistics"><a class="viewcode-back" href="../../web/meta.html#meta.views.statistics">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/statistics&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">statistics</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;statistics.html&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="month_statistics"><a class="viewcode-back" href="../../web/meta.html#meta.views.month_statistics">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/statistics/month&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">month_statistics</span><span class="p">():</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">get_statistics_per_month</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">])</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">][</span><span class="s2">&quot;docs&quot;</span><span class="p">])</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;StudyDate&quot;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;test.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="statistics_data"><a class="viewcode-back" href="../../web/meta.html#meta.views.statistics_data">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/statistics/data.csv&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">statistics_data</span><span class="p">():</span>
+    <span class="n">years</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;2011&quot;</span><span class="p">,</span> <span class="s2">&quot;2012&quot;</span><span class="p">,</span> <span class="s2">&quot;2013&quot;</span><span class="p">,</span> <span class="s2">&quot;2014&quot;</span><span class="p">,</span> <span class="s2">&quot;2015&quot;</span><span class="p">,</span> <span class="s2">&quot;2016&quot;</span><span class="p">,</span> <span class="s2">&quot;2017&quot;</span><span class="p">,</span> <span class="s2">&quot;2018&quot;</span><span class="p">,</span> <span class="s2">&quot;2019&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;institute_statistics_</span><span class="si">{year}</span><span class="s2">.csv&quot;</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">get_statistics_per_year</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">][</span><span class="s2">&quot;docs&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">year</span><span class="p">],</span>
+                        <span class="s2">&quot;institution_type&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Main&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;InstitutionName&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="s2">&quot;StudyDate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">calculate</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;institute_statistics_</span><span class="si">{year}</span><span class="s2">.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;institute_statistics_</span><span class="si">{year}</span><span class="s2">.csv&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_statistics_per_month"><a class="viewcode-back" href="../../web/meta.html#meta.views.get_statistics_per_month">[docs]</a><span class="k">def</span> <span class="nf">get_statistics_per_month</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rows&quot;</span><span class="p">:</span> <span class="s2">&quot;10000000&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fq&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Category:parent&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;fq&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">f</span><span class="s2">&quot;StudyDate:[</span><span class="si">{date}</span><span class="s2">01 TO </span><span class="si">{date}</span><span class="s2">31]&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;fl&quot;</span><span class="p">:</span> <span class="s2">&quot;InstitutionName, StudyDate&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">solr_url</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">),</span> <span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_statistics_per_year"><a class="viewcode-back" href="../../web/meta.html#meta.views.get_statistics_per_year">[docs]</a><span class="k">def</span> <span class="nf">get_statistics_per_year</span><span class="p">(</span><span class="n">year</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rows&quot;</span><span class="p">:</span> <span class="s2">&quot;10000000&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fq&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Category:parent&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;fq&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">f</span><span class="s2">&quot;StudyDate:[</span><span class="si">{year}</span><span class="s2">0101 TO </span><span class="si">{year}</span><span class="s2">1241]&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;fl&quot;</span><span class="p">:</span> <span class="s2">&quot;InstitutionName, StudyDate&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">solr_url</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">),</span> <span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_statistics"><a class="viewcode-back" href="../../web/meta.html#meta.views.get_statistics">[docs]</a><span class="k">def</span> <span class="nf">get_statistics</span><span class="p">():</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rows&quot;</span><span class="p">:</span> <span class="s2">&quot;10000000&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fq&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Category:parent&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;fl&quot;</span><span class="p">:</span> <span class="s2">&quot;InstitutionName, StudyDate&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">solr_url</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">),</span> <span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Joshy Cyriac
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

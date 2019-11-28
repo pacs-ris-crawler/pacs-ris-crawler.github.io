@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; PACS-RIS Crawler 1.0a documentation</title>
+  <title>Introduction &mdash; PACS-RIS Crawler 1.0a documentation</title>
   
 
   
@@ -25,7 +25,6 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
-        <script type="text/javascript" src="_static/searchtools.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -35,7 +34,9 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Systems Overview" href="overview.html" />
+    <link rel="prev" title="Welcome to PACS-RIS Crawler’s documentation!" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -62,7 +63,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -80,8 +81,12 @@
             
             
               <p class="caption"><span class="caption-text">User Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#why-is-this-tool-necessary">Why is this tool necessary?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-does-it-work">How does it work</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Systems Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation guide</a></li>
 </ul>
@@ -133,12 +138,14 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Search</li>
+      <li>Introduction</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
+            <a href="_sources/intro.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -150,24 +157,43 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>What is the PACS-RIS Crawler?</p>
+<div class="section" id="why-is-this-tool-necessary">
+<h2>Why is this tool necessary?<a class="headerlink" href="#why-is-this-tool-necessary" title="Permalink to this headline">¶</a></h2>
+<p>The usual usecase for PACS/RIS is single patient-oriented. This is sufficient
+for the clinical routine. In the research setting, where patients cohorts are
+the unit of work getting the data for the cohorts is cumbersome and very
+time consuming. Exams are loaded one by one in the PACS and if it matches the
+research criteria they are included in the cohort.</p>
+<p>With the PACS-Ris tool it is possible to search all exams at once with the
+corresponding RIS Report. So finding all x-ray images with a e.g.
+wrist fracture now takes only seconds instead of days.</p>
+</div>
+<div class="section" id="how-does-it-work">
+<h2>How does it work<a class="headerlink" href="#how-does-it-work" title="Permalink to this headline">¶</a></h2>
+<p>The PACS-RIS Crawler consists of mainly three modules. The crawler modules is
+reponsible to querying the PACS and RIS for data and storing them. The web
+frontend is web application which is the main user interface for the doctor.
+The receiver module is responsible for retrieving the images from the PACS.</p>
+</div>
+</div>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="overview.html" class="btn btn-neutral float-right" title="Systems Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to PACS-RIS Crawler’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -200,14 +226,7 @@
   
   
     
-  
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
    
-
 
 </body>
 </html>

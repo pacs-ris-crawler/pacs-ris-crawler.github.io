@@ -1,0 +1,102 @@
+web package
+===========
+
+Submodules
+----------
+
+web.app module
+--------------
+
+.. automodule:: web.app
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+web.config module
+-----------------
+
+.. automodule:: web.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+web.convert module
+------------------
+
+.. automodule:: web.convert
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+web.paging module
+-----------------
+
+.. automodule:: web.paging
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+web.query module
+----------------
+
+.. automodule:: web.query
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+web.query\_all module
+---------------------
+
+.. automodule:: web.query_all
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+web.query\_param module
+-----------------------
+
+.. automodule:: web.query_param
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+web.solr module
+---------------
+
+.. automodule:: web.solr
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+web.statistics module
+---------------------
+
+.. automodule:: web.statistics
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+web.terms module
+----------------
+
+.. automodule:: web.terms
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+web.views module
+----------------
+
+.. automodule:: web.views
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: web
+   :members:
+   :undoc-members:
+   :show-inheritance:

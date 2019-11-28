@@ -1,0 +1,46 @@
+receiver package
+================
+
+Submodules
+----------
+
+receiver.app module
+-------------------
+
+.. automodule:: receiver.app
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+receiver.config module
+----------------------
+
+.. automodule:: receiver.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+receiver.executor module
+------------------------
+
+.. automodule:: receiver.executor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+receiver.job module
+-------------------
+
+.. automodule:: receiver.job
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: receiver
+   :members:
+   :undoc-members:
+   :show-inheritance:

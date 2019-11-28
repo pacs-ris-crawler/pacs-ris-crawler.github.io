@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>web package &mdash; Pacs-Ris Crawler 1.0a documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Pacs-Ris Crawler
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">web package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#web-app-module">web.app module</a></li>
+<li><a class="reference internal" href="#module-web.config">web.config module</a></li>
+<li><a class="reference internal" href="#module-web.convert">web.convert module</a></li>
+<li><a class="reference internal" href="#module-web.paging">web.paging module</a></li>
+<li><a class="reference internal" href="#module-web.query">web.query module</a></li>
+<li><a class="reference internal" href="#module-web.query_all">web.query_all module</a></li>
+<li><a class="reference internal" href="#module-web.query_param">web.query_param module</a></li>
+<li><a class="reference internal" href="#module-web.solr">web.solr module</a></li>
+<li><a class="reference internal" href="#module-web.statistics">web.statistics module</a></li>
+<li><a class="reference internal" href="#module-web.terms">web.terms module</a></li>
+<li><a class="reference internal" href="#web-views-module">web.views module</a></li>
+<li><a class="reference internal" href="#module-web">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Pacs-Ris Crawler</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>web package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/web/web.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="web-package">
+<h1>web package<a class="headerlink" href="#web-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="web-app-module">
+<h2>web.app module<a class="headerlink" href="#web-app-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-web.config">
+<span id="web-config-module"></span><h2>web.config module<a class="headerlink" href="#module-web.config" title="Permalink to this headline">¶</a></h2>
+<p>All configuration options
+can be accessed from here.</p>
+<dl class="class">
+<dt id="web.config.DcmtkConfig">
+<em class="property">class </em><code class="sig-prename descclassname">web.config.</code><code class="sig-name descname">DcmtkConfig</code><span class="sig-paren">(</span><em class="sig-param">dcmtk_bin</em>, <em class="sig-param">dcmin</em><span class="sig-paren">)</span><a class="headerlink" href="#web.config.DcmtkConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="method">
+<dt id="web.config.DcmtkConfig.dcmin">
+<em class="property">property </em><code class="sig-name descname">dcmin</code><a class="headerlink" href="#web.config.DcmtkConfig.dcmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="web.config.DcmtkConfig.dcmtk_bin">
+<em class="property">property </em><code class="sig-name descname">dcmtk_bin</code><a class="headerlink" href="#web.config.DcmtkConfig.dcmtk_bin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="web.config.PacsConfig">
+<em class="property">class </em><code class="sig-prename descclassname">web.config.</code><code class="sig-name descname">PacsConfig</code><span class="sig-paren">(</span><em class="sig-param">ae_title</em>, <em class="sig-param">ae_called</em>, <em class="sig-param">peer_address</em>, <em class="sig-param">peer_port</em>, <em class="sig-param">incoming_port</em><span class="sig-paren">)</span><a class="headerlink" href="#web.config.PacsConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="method">
+<dt id="web.config.PacsConfig.ae_called">
+<em class="property">property </em><code class="sig-name descname">ae_called</code><a class="headerlink" href="#web.config.PacsConfig.ae_called" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="web.config.PacsConfig.ae_title">
+<em class="property">property </em><code class="sig-name descname">ae_title</code><a class="headerlink" href="#web.config.PacsConfig.ae_title" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="web.config.PacsConfig.incoming_port">
+<em class="property">property </em><code class="sig-name descname">incoming_port</code><a class="headerlink" href="#web.config.PacsConfig.incoming_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="web.config.PacsConfig.peer_address">
+<em class="property">property </em><code class="sig-name descname">peer_address</code><a class="headerlink" href="#web.config.PacsConfig.peer_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="web.config.PacsConfig.peer_port">
+<em class="property">property </em><code class="sig-name descname">peer_port</code><a class="headerlink" href="#web.config.PacsConfig.peer_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="web.config.dcmtk_config">
+<code class="sig-prename descclassname">web.config.</code><code class="sig-name descname">dcmtk_config</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/config.html#dcmtk_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.config.dcmtk_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dcmtk configuration.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="web.config.pacs_config">
+<code class="sig-prename descclassname">web.config.</code><code class="sig-name descname">pacs_config</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/config.html#pacs_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.config.pacs_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the pacs configuration parameters.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-web.convert">
+<span id="web-convert-module"></span><h2>web.convert module<a class="headerlink" href="#module-web.convert" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="web.convert.convert">
+<code class="sig-prename descclassname">web.convert.</code><code class="sig-name descname">convert</code><span class="sig-paren">(</span><em class="sig-param">df</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/convert.html#convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.convert.convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the query all dataframe to a download json structure</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-web.paging">
+<span id="web-paging-module"></span><h2>web.paging module<a class="headerlink" href="#module-web.paging" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="web.paging.calc">
+<code class="sig-prename descclassname">web.paging.</code><code class="sig-name descname">calc</code><span class="sig-paren">(</span><em class="sig-param">results: int</em>, <em class="sig-param">current: int</em>, <em class="sig-param">limit=100</em><span class="sig-paren">)</span> &#x2192; List[Tuple[int, int, bool, bool, bool]]<a class="reference internal" href="../_modules/web/paging.html#calc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.paging.calc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zero based paging. PAGING_LINKS is the number of
+pages links to be shown. Because results can be easily
+more than e.g. 50 pages, then only number of PAGING_LINKS are
+rendered.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-web.query">
+<span id="web-query-module"></span><h2>web.query module<a class="headerlink" href="#module-web.query" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="web.query.query_body">
+<code class="sig-prename descclassname">web.query.</code><code class="sig-name descname">query_body</code><span class="sig-paren">(</span><em class="sig-param">args</em>, <em class="sig-param">limit=100</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/query.html#query_body"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.query.query_body" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="web.query.query_indexed_dates">
+<code class="sig-prename descclassname">web.query.</code><code class="sig-name descname">query_indexed_dates</code><span class="sig-paren">(</span><em class="sig-param">base_query</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/query.html#query_indexed_dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.query.query_indexed_dates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-web.query_all">
+<span id="web-query-all-module"></span><h2>web.query_all module<a class="headerlink" href="#module-web.query_all" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="web.query_all.query_all">
+<code class="sig-prename descclassname">web.query_all.</code><code class="sig-name descname">query_all</code><span class="sig-paren">(</span><em class="sig-param">search_params: werkzeug.datastructures.MultiDict</em>, <em class="sig-param">solr_url: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/query_all.html#query_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.query_all.query_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-web.query_param">
+<span id="web-query-param-module"></span><h2>web.query_param module<a class="headerlink" href="#module-web.query_param" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="web.query_param.delete_query_parameter">
+<code class="sig-prename descclassname">web.query_param.</code><code class="sig-name descname">delete_query_parameter</code><span class="sig-paren">(</span><em class="sig-param">url</em>, <em class="sig-param">param_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/query_param.html#delete_query_parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.query_param.delete_query_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a URL, removes the query parameter and returns the
+modified URL.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delete_query_parameter</span><span class="p">(</span><span class="s1">&#39;http://example.com?foo=bar&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">)</span>
+<span class="go">&#39;http://example.com&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="web.query_param.set_query_parameter">
+<code class="sig-prename descclassname">web.query_param.</code><code class="sig-name descname">set_query_parameter</code><span class="sig-paren">(</span><em class="sig-param">url</em>, <em class="sig-param">param_name</em>, <em class="sig-param">param_value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/query_param.html#set_query_parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.query_param.set_query_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a URL, set or replace a query parameter and return the
+modified URL.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">set_query_parameter</span><span class="p">(</span><span class="s1">&#39;http://example.com?foo=bar&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;stuff&#39;</span><span class="p">)</span>
+<span class="go">&#39;http://example.com?foo=stuff&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-web.solr">
+<span id="web-solr-module"></span><h2>web.solr module<a class="headerlink" href="#module-web.solr" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="web.solr.solr_terms_url">
+<code class="sig-prename descclassname">web.solr.</code><code class="sig-name descname">solr_terms_url</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/solr.html#solr_terms_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.solr.solr_terms_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the solr base url.
+Core name and host are taking from configuration which needs to be passed
+in. Can be a simple dictionary.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="web.solr.solr_url">
+<code class="sig-prename descclassname">web.solr.</code><code class="sig-name descname">solr_url</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/solr.html#solr_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.solr.solr_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the solr url.
+Core name and host are taking from configuration which needs to be passed
+in. Can be a simple dictionary.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-web.statistics">
+<span id="web-statistics-module"></span><h2>web.statistics module<a class="headerlink" href="#module-web.statistics" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="web.statistics.calculate">
+<code class="sig-prename descclassname">web.statistics.</code><code class="sig-name descname">calculate</code><span class="sig-paren">(</span><em class="sig-param">df</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/statistics.html#calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.statistics.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="web.statistics.mapping">
+<code class="sig-prename descclassname">web.statistics.</code><code class="sig-name descname">mapping</code><span class="sig-paren">(</span><em class="sig-param">input</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/statistics.html#mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.statistics.mapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-web.terms">
+<span id="web-terms-module"></span><h2>web.terms module<a class="headerlink" href="#module-web.terms" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="web.terms.get_terms_data">
+<code class="sig-prename descclassname">web.terms.</code><code class="sig-name descname">get_terms_data</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/web/terms.html#get_terms_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.terms.get_terms_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="web-views-module">
+<h2>web.views module<a class="headerlink" href="#web-views-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-web">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-web" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Joshy Cyriac
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

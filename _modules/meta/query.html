@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>meta.query &mdash; PACS-RIS Crawler 1.0a documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PACS-RIS Crawler
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Systems Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Code Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PACS-RIS Crawler</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>meta.query</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for meta.query</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+
+<span class="n">DEFAULT_PAYLOAD</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;offset&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;limit&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;group.field&#39;</span><span class="p">:</span> <span class="s1">&#39;PatientID&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;group.limit&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;group.ngroups&#39;</span><span class="p">:</span> <span class="s1">&#39;true&#39;</span><span class="p">}</span>
+                  <span class="p">}</span>
+
+
+<div class="viewcode-block" id="query_body"><a class="viewcode-back" href="../../web/meta.html#meta.query.query_body">[docs]</a><span class="k">def</span> <span class="nf">query_body</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">DEFAULT_PAYLOAD</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">body</span><span class="p">[</span><span class="s1">&#39;limit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">limit</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;RisReport&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;RisReport&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;RisReport&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">):</span>
+        <span class="c1"># Old exams have no report that is why we must match all documents.</span>
+        <span class="n">body</span><span class="p">[</span><span class="s1">&#39;query&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Category:parent&#39;</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;RisReport&quot;</span><span class="p">):</span>
+        <span class="n">body</span><span class="p">[</span><span class="s1">&#39;query&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RisReport:(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;RisReport&#39;</span><span class="p">,</span><span class="s1">&#39;*&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">body</span><span class="p">[</span><span class="s1">&#39;query&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RisReport:*&#39;</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;Modality&#39;</span><span class="p">):</span>
+        <span class="n">modalities</span> <span class="o">=</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="s2">&quot; OR &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;Modality&#39;</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+        <span class="n">filters2</span> <span class="o">=</span> <span class="s1">&#39;{!parent which=Category:parent}(+Modality:&#39;</span> <span class="o">+</span> <span class="n">modalities</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SeriesDescription&#39;</span><span class="p">):</span>
+            <span class="n">body</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">][</span><span class="s1">&#39;fl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;*,[child parentFilter=Category:parent childFilter=&#39;(Modality:</span><span class="si">{}</span><span class="s2"> OR SeriesDescription:</span><span class="si">{}</span><span class="s2">)&#39; limit=200]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">modalities</span><span class="p">,</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SeriesDescription&#39;</span><span class="p">))</span>
+            <span class="n">filters1</span> <span class="o">=</span> <span class="s1">&#39;{!parent which=Category:parent}(+SeriesDescription:</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SeriesDescription&#39;</span><span class="p">)</span>
+            <span class="n">body</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_create_filter_query</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">filters2</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">filters1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">body</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">][</span><span class="s1">&#39;fl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;*,[child parentFilter=Category:parent childFilter=&#39;Modality:</span><span class="si">{}</span><span class="s2">&#39; limit=200]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">modalities</span><span class="p">)</span>
+            <span class="n">body</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_create_filter_query</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">filters2</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SeriesDescription&#39;</span><span class="p">):</span>
+        <span class="n">body</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">][</span><span class="s1">&#39;fl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;*,[child parentFilter=Category:parent childFilter=&#39;SeriesDescription:</span><span class="si">{}</span><span class="s2">&#39; limit=200]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SeriesDescription&#39;</span><span class="p">))</span>
+        <span class="n">filters1</span> <span class="o">=</span> <span class="s1">&#39;{!parent which=Category:parent}(+SeriesDescription:</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SeriesDescription&#39;</span><span class="p">)</span>
+        <span class="n">body</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_create_filter_query</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">filters1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">body</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">][</span><span class="s1">&#39;fl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;*,[child parentFilter=Category:parent limit=200]&#39;</span>
+        <span class="n">body</span><span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_create_filter_query</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+
+    <span class="n">body</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;offset&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">))</span>
+    <span class="n">sort_field</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sort_field&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sort_field</span> <span class="ow">and</span> <span class="n">sort_field</span> <span class="o">!=</span> <span class="s1">&#39;Default&#39;</span><span class="p">:</span>
+        <span class="n">body</span><span class="p">[</span><span class="s1">&#39;sort&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> desc&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sort_field</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">body</span><span class="p">[</span><span class="s1">&#39;sort&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;StudyDate desc&#39;</span>
+    <span class="k">return</span> <span class="n">body</span></div>
+
+
+<span class="k">def</span> <span class="nf">_create_filter_query</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">_filter</span><span class="p">(</span><span class="s1">&#39;StudyDescription&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span>
+              <span class="n">_filter</span><span class="p">(</span><span class="s1">&#39;PatientID&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span>
+              <span class="n">_filter</span><span class="p">(</span><span class="s1">&#39;PatientName&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span>
+              <span class="n">_filter</span><span class="p">(</span><span class="s1">&#39;AccessionNumber&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span>
+              <span class="n">_filter</span><span class="p">(</span><span class="s1">&#39;ReferringPhysicianName&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span>
+              <span class="n">_filter</span><span class="p">(</span><span class="s1">&#39;ProtocolName&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span>
+              <span class="n">_create_date</span><span class="p">(</span><span class="s1">&#39;PatientBirthDate&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span>
+              <span class="n">_create_date</span><span class="p">(</span><span class="s1">&#39;StudyDate&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span>
+              <span class="n">_create_date_range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;StartDate&#39;</span><span class="p">),</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;EndDate&#39;</span><span class="p">)),</span>
+              <span class="n">_create_age_range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;AgeFrom&#39;</span><span class="p">),</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;AgeTo&#39;</span><span class="p">))</span> <span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_filter</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">element</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">element</span> <span class="o">+</span> <span class="s1">&#39;:(&#39;</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">element</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">_filter_list</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="n">element</span><span class="p">):</span>
+        <span class="n">a_list</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="n">joined</span> <span class="o">=</span> <span class="s1">&#39; OR &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">element</span> <span class="o">+</span> <span class="s1">&#39;:(&#39;</span> <span class="o">+</span> <span class="n">joined</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">_create_date</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">element</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">element</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_create_date_range</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">start_date</span> <span class="ow">or</span> <span class="n">end_date</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">_start_date</span> <span class="o">=</span> <span class="n">_convert</span><span class="p">(</span><span class="n">start_date</span><span class="p">)</span>
+    <span class="n">_end_date</span> <span class="o">=</span> <span class="n">_convert</span><span class="p">(</span><span class="n">end_date</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39;StudyDate:[&#39;</span> <span class="o">+</span> <span class="n">_start_date</span> <span class="o">+</span> <span class="s1">&#39; TO &#39;</span> <span class="o">+</span> <span class="n">_end_date</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">_create_age_range</span><span class="p">(</span><span class="n">age_from</span><span class="p">,</span> <span class="n">age_to</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">age_from</span> <span class="ow">or</span> <span class="n">age_to</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">age_to</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;PatientAge:[&#39;</span> <span class="o">+</span> <span class="n">age_from</span> <span class="o">+</span> <span class="s1">&#39; TO *]&#39;</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">age_from</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;PatientAge:[* TO &#39;</span> <span class="o">+</span> <span class="n">age_to</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;PatientAge:[&#39;</span> <span class="o">+</span> <span class="n">age_from</span> <span class="o">+</span> <span class="s1">&#39; TO &#39;</span> <span class="o">+</span> <span class="n">age_to</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">_convert</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a date from the frontend which is passed in the following format</span>
+<span class="sd">    31.12.2016 to 20161231. This is how it is stored in solr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;*&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">.%m.%Y&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Could not parse date </span><span class="si">%s</span><span class="s1">, setting it to &quot;*&quot;&#39;</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;*&#39;</span>
+
+
+<div class="viewcode-block" id="query_indexed_dates"><a class="viewcode-back" href="../../web/meta.html#meta.query.query_indexed_dates">[docs]</a><span class="k">def</span> <span class="nf">query_indexed_dates</span><span class="p">(</span><span class="n">base_query</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">base_query</span> <span class="o">+</span> <span class="s2">&quot;?fl=StudyDate&amp;q=*:*&amp;stats.field=StudyDate&amp;stats=true&quot;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Joshy Cyriac
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

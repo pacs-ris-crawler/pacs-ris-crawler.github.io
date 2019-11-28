@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>crawler.dicom &mdash; PACS-RIS Crawler 1.0a documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PACS-RIS Crawler
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Systems Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Code Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PACS-RIS Crawler</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>crawler.dicom</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for crawler.dicom</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; A simple regex based parser for DICOM (DCMTK output to be more precise). &quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="n">PATIENT_NAME</span> <span class="o">=</span> <span class="s2">&quot;PatientName&quot;</span>
+<span class="n">PATIENT_BIRTHDATE</span> <span class="o">=</span> <span class="s2">&quot;PatientBirthDate&quot;</span>
+<span class="n">PATIENT_ID</span> <span class="o">=</span> <span class="s2">&quot;PatientID&quot;</span>
+<span class="n">PATIENT_SEX</span> <span class="o">=</span> <span class="s2">&quot;PatientSex&quot;</span>
+<span class="n">STUDY_DATE</span> <span class="o">=</span> <span class="s2">&quot;StudyDate&quot;</span>
+<span class="n">SERIES_DATE</span> <span class="o">=</span> <span class="s2">&quot;SeriesDate&quot;</span>
+<span class="n">SERIES_TIME</span> <span class="o">=</span> <span class="s2">&quot;SeriesTime&quot;</span>
+<span class="n">MODALITY</span> <span class="o">=</span> <span class="s2">&quot;Modality&quot;</span>
+<span class="n">BODY_PART_EXAMINED</span> <span class="o">=</span> <span class="s2">&quot;BodyPartExamined&quot;</span>
+<span class="n">STUDY_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;StudyDescription&quot;</span>
+<span class="n">SERIES_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;SeriesDescription&quot;</span>
+<span class="n">ACCESSION_NUMBER</span> <span class="o">=</span> <span class="s2">&quot;AccessionNumber&quot;</span>
+<span class="n">STUDY_ID</span> <span class="o">=</span> <span class="s2">&quot;StudyID&quot;</span>
+<span class="n">SERIES_NUMBER</span> <span class="o">=</span> <span class="s2">&quot;SeriesNumber&quot;</span>
+<span class="n">INSTANCE_NUMBER</span> <span class="o">=</span> <span class="s2">&quot;InstanceNumber&quot;</span>
+<span class="n">REFERRING_PHYSICIAN_NAME</span> <span class="o">=</span> <span class="s2">&quot;ReferringPhysicianName&quot;</span>
+<span class="n">INSTANCE_AVAILABILITY</span> <span class="o">=</span> <span class="s2">&quot;InstanceAvailability&quot;</span>
+<span class="n">INSTITUTION_NAME</span> <span class="o">=</span> <span class="s2">&quot;InstitutionName&quot;</span>
+<span class="n">STUDY_INSTANCE_UID</span> <span class="o">=</span> <span class="s2">&quot;StudyInstanceUID&quot;</span>
+<span class="n">SERIES_INSTANCE_UID</span> <span class="o">=</span> <span class="s2">&quot;SeriesInstanceUID&quot;</span>
+<span class="n">SPECIFIC_CHARACTER_SET</span> <span class="o">=</span> <span class="s2">&quot;SpecificCharacterSet&quot;</span>
+<span class="n">QUERY_RETRIEVE_LEVEL</span> <span class="o">=</span> <span class="s2">&quot;QueryRetrieveLevel&quot;</span>
+<span class="n">RETRIEVE_AE_TITLE</span> <span class="o">=</span> <span class="s2">&quot;RetrieveAETitle&quot;</span>
+<span class="n">STATION_NAME</span> <span class="o">=</span> <span class="s2">&quot;StationName&quot;</span>
+<span class="n">PROTOCOL_NAME</span> <span class="o">=</span> <span class="s2">&quot;ProtocolName&quot;</span>
+
+<span class="n">TAGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;(0010,0010)&quot;</span><span class="p">:</span> <span class="n">PATIENT_NAME</span><span class="p">,</span>
+    <span class="s2">&quot;(0010,0030)&quot;</span><span class="p">:</span> <span class="n">PATIENT_BIRTHDATE</span><span class="p">,</span>
+    <span class="s2">&quot;(0010,0020)&quot;</span><span class="p">:</span> <span class="n">PATIENT_ID</span><span class="p">,</span>
+    <span class="s2">&quot;(0010,0040)&quot;</span><span class="p">:</span> <span class="n">PATIENT_SEX</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,0020)&quot;</span><span class="p">:</span> <span class="n">STUDY_DATE</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,0021)&quot;</span><span class="p">:</span> <span class="n">SERIES_DATE</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,0031)&quot;</span><span class="p">:</span> <span class="n">SERIES_TIME</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,0060)&quot;</span><span class="p">:</span> <span class="n">MODALITY</span><span class="p">,</span>
+    <span class="s2">&quot;(0018,0015)&quot;</span><span class="p">:</span> <span class="n">BODY_PART_EXAMINED</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,1010)&quot;</span><span class="p">:</span> <span class="n">STATION_NAME</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,1030)&quot;</span><span class="p">:</span> <span class="n">STUDY_DESCRIPTION</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,103e)&quot;</span><span class="p">:</span> <span class="n">SERIES_DESCRIPTION</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,0050)&quot;</span><span class="p">:</span> <span class="n">ACCESSION_NUMBER</span><span class="p">,</span>
+    <span class="s2">&quot;(0020,0010)&quot;</span><span class="p">:</span> <span class="n">STUDY_ID</span><span class="p">,</span>
+    <span class="s2">&quot;(0020,0011)&quot;</span><span class="p">:</span> <span class="n">SERIES_NUMBER</span><span class="p">,</span>
+    <span class="s2">&quot;(0020,0013)&quot;</span><span class="p">:</span> <span class="n">INSTANCE_NUMBER</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,0090)&quot;</span><span class="p">:</span> <span class="n">REFERRING_PHYSICIAN_NAME</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,0056)&quot;</span><span class="p">:</span> <span class="n">INSTANCE_AVAILABILITY</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,0080)&quot;</span><span class="p">:</span> <span class="n">INSTITUTION_NAME</span><span class="p">,</span>
+    <span class="s2">&quot;(0018,1030)&quot;</span><span class="p">:</span> <span class="n">PROTOCOL_NAME</span><span class="p">,</span>
+    <span class="s2">&quot;(0020,000d)&quot;</span><span class="p">:</span> <span class="n">STUDY_INSTANCE_UID</span><span class="p">,</span>
+    <span class="s2">&quot;(0020,000e)&quot;</span><span class="p">:</span> <span class="n">SERIES_INSTANCE_UID</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,0005)&quot;</span><span class="p">:</span> <span class="n">SPECIFIC_CHARACTER_SET</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,0052)&quot;</span><span class="p">:</span> <span class="n">QUERY_RETRIEVE_LEVEL</span><span class="p">,</span>
+    <span class="s2">&quot;(0008,0054)&quot;</span><span class="p">:</span> <span class="n">RETRIEVE_AE_TITLE</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">START_OR_END</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^I:\s*$&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_results"><a class="viewcode-back" href="../../crawler/crawler.html#crawler.dicom.get_results">[docs]</a><span class="k">def</span> <span class="nf">get_results</span><span class="p">(</span><span class="n">strings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get list of results found. A single result is a dictionary</span>
+<span class="sd">    where the keys are the DICOM tags and the value is the DICOM value.</span>
+<span class="sd">    :param strings: list of strings</span>
+<span class="sd">    :return: list of results (result is a dictionary)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">single_result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">strings</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_is_valid</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="n">single_result</span><span class="p">[</span><span class="n">_get_tag</span><span class="p">(</span><span class="n">line</span><span class="p">)]</span> <span class="o">=</span> <span class="n">_get_value</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_is_start_or_end</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="ow">and</span> <span class="n">single_result</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">single_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+            <span class="n">single_result</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">single_result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span></div>
+
+
+<span class="k">def</span> <span class="nf">_is_start_or_end</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Returns True if it is the start or end of a DICOM header. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;I: ---------------------------&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span>
+        <span class="s2">&quot;W: ---------------------------&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_is_valid</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;I:&quot;</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="s2">&quot;(&quot;</span> <span class="ow">in</span> <span class="n">line</span>
+        <span class="ow">and</span> <span class="s2">&quot;)&quot;</span> <span class="ow">in</span> <span class="n">line</span>
+        <span class="ow">and</span> <span class="s2">&quot;[&quot;</span> <span class="ow">in</span> <span class="n">line</span>
+        <span class="ow">and</span> <span class="s2">&quot;]&quot;</span> <span class="ow">in</span> <span class="n">line</span>
+    <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+        <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;W:&quot;</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="s2">&quot;(&quot;</span> <span class="ow">in</span> <span class="n">line</span>
+        <span class="ow">and</span> <span class="s2">&quot;)&quot;</span> <span class="ow">in</span> <span class="n">line</span>
+        <span class="ow">and</span> <span class="s2">&quot;[&quot;</span> <span class="ow">in</span> <span class="n">line</span>
+        <span class="ow">and</span> <span class="s2">&quot;]&quot;</span> <span class="ow">in</span> <span class="n">line</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_tag_value</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">_get_tag</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="n">_get_value</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_tag</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the resolved tag value of the line. It first gets the content</span>
+<span class="sd">    between the first round brackets and then makes a lookup to get the</span>
+<span class="sd">    tag value.</span>
+<span class="sd">    For example on this line</span>
+<span class="sd">        I: (0010,0040) CS [F ]</span>
+<span class="sd">    tag value would be (0010,0040) and resolved would be &#39;Modality&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">TAGS</span><span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">14</span><span class="p">]]</span>
+
+
+<span class="k">def</span> <span class="nf">_get_value</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the value of the line, which is everything between</span>
+<span class="sd">    the first and last square bracket.</span>
+<span class="sd">    :param line: a line of the Dicom file</span>
+<span class="sd">    :return: value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">line</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot; </span><span class="se">\t\r\n\0</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Joshy Cyriac
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

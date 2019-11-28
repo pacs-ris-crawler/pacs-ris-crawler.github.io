@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; PACS-RIS Crawler 1.0a documentation</title>
+  <title>Systems Overview &mdash; PACS-RIS Crawler 1.0a documentation</title>
   
 
   
@@ -25,7 +25,6 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
-        <script type="text/javascript" src="_static/searchtools.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -35,7 +34,9 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation guide" href="install.html" />
+    <link rel="prev" title="What is the PACS-RIS Crawler?" href="intro.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -62,7 +63,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -80,9 +81,14 @@
             
             
               <p class="caption"><span class="caption-text">User Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Systems Overview</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is the PACS-RIS Crawler?</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Systems Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-collection">Data collection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#user-interface">User interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#receiving-images">Receiving images</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation guide</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Developer Information</span></p>
@@ -133,12 +139,14 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Search</li>
+      <li>Systems Overview</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
+            <a href="_sources/overview.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -150,24 +158,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="systems-overview">
+<h1>Systems Overview<a class="headerlink" href="#systems-overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="data-collection">
+<h2>Data collection<a class="headerlink" href="#data-collection" title="Permalink to this headline">¶</a></h2>
+<p>All the patient imaging metadata is retrieved with a batch process from the PACS. That’s information about the patient and the exams. This includeds e.g. modality and series information. In a second step the information is merged with the RIS Report, based on the accession number and sent to Apache Solr. Solr is a search server with a REST API. It allows to query on all stored attributes and text with advanced full-text search like wildcards and range queries.</p>
+</div>
+<div class="section" id="user-interface">
+<h2>User interface<a class="headerlink" href="#user-interface" title="Permalink to this headline">¶</a></h2>
+<p>As the default interface to Apache Solr is not very user friendly a web application was build on top of it. It is a Python web application, the Backend is build with the Flask microframework and a HTML/JS/jQuery Frontend. It is a user friendly interface which is self explanatory. All the possible search fields are visible and e.g. multiple choice options are presented as HTML checkboxes. On the search result the user has the option to send to data to another PACS node in the network, download the images for further processing or to export the result as Excel for e.g. statistical analysis.</p>
+</div>
+<div class="section" id="receiving-images">
+<h2>Receiving images<a class="headerlink" href="#receiving-images" title="Permalink to this headline">¶</a></h2>
+<p>TBD</p>
+</div>
+</div>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="install.html" class="btn btn-neutral float-right" title="Installation guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="intro.html" class="btn btn-neutral float-left" title="What is the PACS-RIS Crawler?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -200,14 +220,7 @@
   
   
     
-  
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
    
-
 
 </body>
 </html>

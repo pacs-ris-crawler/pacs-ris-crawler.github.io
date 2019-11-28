@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; PACS-RIS Crawler 1.0a documentation</title>
+  <title>Installation guide &mdash; PACS-RIS Crawler 1.0a documentation</title>
   
 
   
@@ -25,7 +25,6 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
-        <script type="text/javascript" src="_static/searchtools.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -35,7 +34,9 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Code Documentation" href="modules.html" />
+    <link rel="prev" title="Systems Overview" href="overview.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -62,7 +63,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -80,10 +81,17 @@
             
             
               <p class="caption"><span class="caption-text">User Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is the PACS-RIS Crawler?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Systems Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hardware">Hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#software">Software</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interface-to-pacs">Interface to PACS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interface-to-ris">Interface to RIS</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Developer Information</span></p>
 <ul>
@@ -133,12 +141,14 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Search</li>
+      <li>Installation guide</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
+            <a href="_sources/install.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -150,24 +160,63 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="installation-guide">
+<h1>Installation guide<a class="headerlink" href="#installation-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="hardware">
+<h2>Hardware<a class="headerlink" href="#hardware" title="Permalink to this headline">¶</a></h2>
+<p>The application can run on commodity or virtualized hardware.
+Typical server specs are:
+* 4 Cores
+* 16 GB Ram
+* 100 GB System disk
+* X TB Shared network drive where the images from the PACS will be stored.</p>
+</div>
+<div class="section" id="software">
+<h2>Software<a class="headerlink" href="#software" title="Permalink to this headline">¶</a></h2>
+<p>The operation system needs to be Ubuntu 18 LTS. The following
+applications/libaries are also needed:
+* Solr 7.x (not compatible with Solr 8.x)
+* Dcmtk
+* Python 3.6
+* Nginx</p>
+</div>
+<div class="section" id="interface-to-pacs">
+<h2>Interface to PACS<a class="headerlink" href="#interface-to-pacs" title="Permalink to this headline">¶</a></h2>
+<p>For querying a PACS the PACS-RIS Crawler needs to be registered at the PACS
+and the following permissions are needed:
+* Right to query the PACS (C-Find)
+* Right to retrieve images from the PACS (C-MOVE)</p>
+<p>Dicom Connection properties needed
+- AE_TITLE = AE-Title of the PACS-RIS registered at PACS
+- AE_CALLED = AE-Title of the PACS
+- PEER_ADDRESS = IP-Adress of the PACS
+- PEER_PORT = Peer port of the PACS
+- INCOMING_PORT = Incoming port for the images</p>
+</div>
+<div class="section" id="interface-to-ris">
+<h2>Interface to RIS<a class="headerlink" href="#interface-to-ris" title="Permalink to this headline">¶</a></h2>
+<p>To retrieve the RIS reports a HTTP rest interface is needed. As the query
+parameter the accession number is passed.</p>
+</div>
+</div>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="modules.html" class="btn btn-neutral float-right" title="Code Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="overview.html" class="btn btn-neutral float-left" title="Systems Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -200,14 +249,7 @@
   
   
     
-  
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
    
-
 
 </body>
 </html>
