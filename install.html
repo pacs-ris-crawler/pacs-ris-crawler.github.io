@@ -82,7 +82,7 @@
             
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="intro.html">What is the PACS-RIS Crawler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Systems Overview</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
@@ -168,33 +168,49 @@
 <div class="section" id="hardware">
 <h2>Hardware<a class="headerlink" href="#hardware" title="Permalink to this headline">¶</a></h2>
 <p>The application can run on commodity or virtualized hardware.
-Typical server specs are:
-* 4 Cores
-* 16 GB Ram
-* 100 GB System disk
-* X TB Shared network drive where the images from the PACS will be stored.</p>
+Typical server specs are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>4 Cores</p></li>
+<li><p>16 GB Ram</p></li>
+<li><p>100 GB System disk</p></li>
+<li><p>X TB Shared network drive where the images from the PACS will be stored.</p></li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="software">
 <h2>Software<a class="headerlink" href="#software" title="Permalink to this headline">¶</a></h2>
 <p>The operation system needs to be Ubuntu 18 LTS. The following
-applications/libaries are also needed:
-* Solr 7.x (not compatible with Solr 8.x)
-* Dcmtk
-* Python 3.6
-* Nginx</p>
+applications/libaries are also needed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Solr 7.x (not compatible with Solr 8.x)</p></li>
+<li><p>Dcmtk</p></li>
+<li><p>Python 3.6</p></li>
+<li><p>Nginx</p></li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="interface-to-pacs">
 <h2>Interface to PACS<a class="headerlink" href="#interface-to-pacs" title="Permalink to this headline">¶</a></h2>
 <p>For querying a PACS the PACS-RIS Crawler needs to be registered at the PACS
-and the following permissions are needed:
-* Right to query the PACS (C-Find)
-* Right to retrieve images from the PACS (C-MOVE)</p>
-<p>Dicom Connection properties needed
-- AE_TITLE = AE-Title of the PACS-RIS registered at PACS
-- AE_CALLED = AE-Title of the PACS
-- PEER_ADDRESS = IP-Adress of the PACS
-- PEER_PORT = Peer port of the PACS
-- INCOMING_PORT = Incoming port for the images</p>
+and the following permissions are needed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Right to query the PACS (C-Find)</p></li>
+<li><p>Right to retrieve images from the PACS (C-MOVE)</p></li>
+</ul>
+</div></blockquote>
+<p>Dicom Connection properties needed</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>AE_TITLE = AE-Title of the PACS-RIS registered at PACS</p></li>
+<li><p>AE_CALLED = AE-Title of the PACS</p></li>
+<li><p>PEER_ADDRESS = IP-Adress of the PACS</p></li>
+<li><p>PEER_PORT = Peer port of the PACS</p></li>
+<li><p>INCOMING_PORT = Incoming port for the images</p></li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="interface-to-ris">
 <h2>Interface to RIS<a class="headerlink" href="#interface-to-ris" title="Permalink to this headline">¶</a></h2>
